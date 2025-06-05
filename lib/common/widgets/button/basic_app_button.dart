@@ -49,7 +49,9 @@ class BasicAppButton extends StatelessWidget {
       style: style,
       label: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+        style:
+            textStyle ??
+            Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
       ),
       icon: Icon(icon, size: iconSize),
     );

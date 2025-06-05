@@ -197,45 +197,51 @@ class _EquipmentDetailsPageState extends State<EquipmentDetailsPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Builder(
-                                    builder: (context) {
-                                      return BasicAppButton(
-                                        onPressed:
-                                        // (equipment.isAvailable == true || equipment.isAvailable == 1)
-                                        //     ?
-                                        () {
-                                          if (equipment.isAvailable == true) null;
-                                          context.read<ButtonStateCubit>().executeNonEither(
-                                            usecase: getIt<CreateLocalEquipmentUsecase>(),
-                                            params: LocalEquipmentCopyEntity(
-                                              id: equipment.id,
-                                              itemId: equipment.itemId,
-                                              isAvailable: equipment.isAvailable,
-                                              copyNum: equipment.copyNum,
-                                              createdAt: equipment.createdAt,
-                                              updatedAt: equipment.updatedAt,
-                                              equipmentId: equipment.officeEquipment.id,
-                                              equipmentName: equipment.officeEquipment.equipmentName!,
-                                              equipmentDescription: equipment.officeEquipment.equipmentDescription,
-                                              categoryId: equipment.categories.id,
-                                              categoryName: equipment.categories.categoryName,
-                                            ),
-                                          );
-                                        },
-                                        style: FilledButton.styleFrom(
-                                          minimumSize: const Size.fromHeight(44),
-                                          backgroundColor:
+                                  Expanded(
+                                    child: Builder(
+                                      builder: (context) {
+                                        return BasicAppButton(
+                                          onPressed:
+                                          // (equipment.isAvailable == true || equipment.isAvailable == 1)
+                                          //     ?
+                                          () {
+                                            if (equipment.isAvailable == true) null;
+                                            context.read<ButtonStateCubit>().executeNonEither(
+                                              usecase: getIt<CreateLocalEquipmentUsecase>(),
+                                              params: LocalEquipmentCopyEntity(
+                                                id: equipment.id,
+                                                itemId: equipment.itemId,
+                                                isAvailable: equipment.isAvailable,
+                                                copyNum: equipment.copyNum,
+                                                createdAt: equipment.createdAt,
+                                                updatedAt: equipment.updatedAt,
+                                                equipmentId: equipment.officeEquipment.id,
+                                                equipmentName: equipment.officeEquipment.equipmentName!,
+                                                equipmentDescription: equipment.officeEquipment.equipmentDescription,
+                                                categoryId: equipment.categories.id,
+                                                categoryName: equipment.categories.categoryName,
+                                              ),
+                                            );
+                                          },
+                                          style:
+                                              equipment.isAvailable == true
+                                                  ? FilledButton.styleFrom(
+                                                    disabledBackgroundColor: Colors.grey,
+                                                    minimumSize: Size(double.infinity, 44),
+                                                  )
+                                                  : FilledButton.styleFrom(
+                                                    backgroundColor: Theme.of(context).colorScheme.primary,
+                                                    minimumSize: Size.fromHeight(44),
+                                                  ),
+                                          loadingStyle: FilledButton.styleFrom(minimumSize: Size.fromHeight(44)),
+                                          title:
                                               (equipment.isAvailable == true || equipment.isAvailable)
-                                                  ? null
-                                                  : Colors.grey.shade400,
-                                        ),
-                                        title:
-                                            (equipment.isAvailable == true || equipment.isAvailable)
-                                                ? "Borrow"
-                                                : "Unavailable",
-                                        icon: Icons.add,
-                                      );
-                                    },
+                                                  ? "Borrow"
+                                                  : "Unavailable",
+                                          icon: Icons.add,
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),

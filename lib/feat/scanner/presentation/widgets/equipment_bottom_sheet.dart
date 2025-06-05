@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sccc_v3/app.dart';
 import 'package:sccc_v3/common/bloc/button/button_state.dart';
 import 'package:sccc_v3/common/bloc/button/button_state_cubit.dart';
 import 'package:sccc_v3/common/widgets/button/basic_app_button.dart';
+import 'package:sccc_v3/core/routes/app_router.dart';
 import 'package:sccc_v3/feat/borrow_list/domain/entities/local_equipment_copy_entity.dart';
-import 'package:sccc_v3/feat/borrow_list/domain/usecase/equipment/create_local_equipment_usecase.dart';
+import 'package:sccc_v3/feat/borrow_list/presentation/cubit/local_item_list_cubit.dart';
 import 'package:sccc_v3/feat/item_list/data/model/equipment_copy_by_copy_num_and_item_id_req.dart';
 import 'package:sccc_v3/feat/item_list/presentation/cubit/equipment_details_cubit.dart';
 import 'package:sccc_v3/feat/item_list/presentation/cubit/equipment_details_states.dart';
-import 'package:sccc_v3/service_locator.dart';
 
 class EquipmentBottomSheet extends StatefulWidget {
   final String itemId;
@@ -63,12 +64,14 @@ class _EquipmentBottomSheetState extends State<EquipmentBottomSheet> {
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Colors.green,
-                content: Text("Successfully added to borrow list."),
+                content: Text("Successfully added to borrow list. Go to borrow list to proceed."),
                 action: SnackBarAction(
-                  label: 'Ok',
+                  label: 'Go',
                   backgroundColor: Colors.white,
                   textColor: Colors.black,
                   onPressed: () {
+                    final context = AppRouter.rootNavigatorKey.currentContext!;
+                    context.push('/borrow_list');
                     rootScaffoldMessengerKey.currentState?.clearSnackBars();
                   },
                 ),
@@ -112,37 +115,46 @@ class _EquipmentBottomSheetState extends State<EquipmentBottomSheet> {
                       Expanded(
                         child: Builder(
                           builder: (context) {
+                            final item = LocalEquipmentCopyEntity(
+                              id: equipment.id,
+                              itemId: equipment.itemId,
+                              isAvailable: equipment.isAvailable,
+                              copyNum: equipment.copyNum,
+                              createdAt: equipment.createdAt,
+                              updatedAt: equipment.updatedAt,
+                              equipmentId: equipment.officeEquipment.id,
+                              equipmentName: equipment.officeEquipment.equipmentName!,
+                              equipmentDescription: equipment.officeEquipment.equipmentDescription,
+                              categoryId: equipment.categories.id,
+                              categoryName: equipment.categories.categoryName,
+                            );
+
+                            final isAvailable = equipment.isAvailable == true;
+
                             return BasicAppButton(
                               onPressed: () {
-                                if (equipment.isAvailable == false) null;
-                                context.read<ButtonStateCubit>().executeNonEither(
-                                  usecase: getIt<CreateLocalEquipmentUsecase>(),
-                                  params: LocalEquipmentCopyEntity(
-                                    id: equipment.id,
-                                    itemId: equipment.itemId,
-                                    isAvailable: equipment.isAvailable,
-                                    copyNum: equipment.copyNum,
-                                    createdAt: equipment.createdAt,
-                                    updatedAt: equipment.updatedAt,
-                                    equipmentId: equipment.officeEquipment.id,
-                                    equipmentName: equipment.officeEquipment.equipmentName!,
-                                    equipmentDescription: equipment.officeEquipment.equipmentDescription,
-                                    categoryId: equipment.categories.id,
-                                    categoryName: equipment.categories.categoryName,
-                                  ),
-                                );
+                                if (!isAvailable) return;
+                                context.read<ButtonStateCubit>().executeCallback(() async {
+                                  await context.read<LocalItemListCubit>().addLocalItem(item);
+                                });
                               },
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size(150, 44),
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                backgroundColor:
-                                    (equipment.isAvailable == true || equipment.isAvailable)
-                                        ? null
-                                        : Colors.grey.shade400,
-                              ),
-                              title:
-                                  (equipment.isAvailable == true || equipment.isAvailable) ? "Borrow" : "Unavailable",
+                              style:
+                                  isAvailable
+                                      ? FilledButton.styleFrom(
+                                        backgroundColor: Theme.of(context).colorScheme.primary,
+                                        minimumSize: const Size.fromHeight(40),
+                                      )
+                                      : FilledButton.styleFrom(
+                                        disabledBackgroundColor: Colors.grey,
+                                        minimumSize: const Size.fromHeight(40),
+                                      ),
+                              loadingStyle: FilledButton.styleFrom(minimumSize: const Size.fromHeight(40)),
+                              title: isAvailable ? "Borrow" : "Unavailable",
+                              textStyle: Theme.of(
+                                context,
+                              ).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
                               icon: Icons.add,
+                              iconSize: 20,
                             );
                           },
                         ),

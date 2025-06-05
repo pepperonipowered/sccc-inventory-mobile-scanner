@@ -18,7 +18,8 @@ import 'package:sccc_v3/service_locator.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
-
+  static GlobalKey<NavigatorState> get rootNavigatorKey => _rootNavigatorKey;
+  
   static GoRouter getRouter(AuthCubit authCubit) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,

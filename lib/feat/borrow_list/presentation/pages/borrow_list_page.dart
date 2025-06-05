@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:input_quantity/input_quantity.dart';
 import 'package:sccc_v3/app.dart';
@@ -63,35 +65,88 @@ class BorrowListPage extends StatelessWidget {
               if (state is LoadingLocalItemListState) {
                 return const Center(child: CircularProgressIndicator());
               }
-
               if (state is ErrorLocalItemListState) {
-                return Center(child: Text('Error: ${state.message}'));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset('assets/images/error.svg', fit: BoxFit.cover, width: 225, height: 225),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Something went wrong 😬!\nTry again later 😔.',
+                        style: Theme.of(context).textTheme.titleLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      // Text(
+                      //   'Error: ${state.message}',
+                      //   style: Theme.of(context).textTheme.titleLarge,
+                      //   textAlign: TextAlign.center,
+                      // ),
+                    ],
+                  ),
+                );
               }
 
               if (state is LoadedLocalItemListState) {
                 final items = state.items;
 
-                if (items.isEmpty) {
-                  return const Center(child: Text('No items in borrow list.'));
+                if (items.isEmpty == false) {
+                  return RefreshIndicator(
+                    onRefresh: () => context.read<LocalItemListCubit>().loadLocalItems(),
+                    child: ListView.builder(
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+
+                        if (item is LocalEquipmentCopyEntity) {
+                          return _buildEquipmentTile(context, item);
+                        } else if (item is LocalSupplyEntity) {
+                          return _buildSupplyTile(context, item);
+                        } else {
+                          return ListTile(title: Text('Item not found.'));
+                        }
+                      },
+                    ),
+                  );
                 }
-
-                return ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-
-                    if (item is LocalEquipmentCopyEntity) {
-                      return _buildEquipmentTile(context, item);
-                    } else if (item is LocalSupplyEntity) {
-                      return _buildSupplyTile(context, item);
-                    } else {
-                      return ListTile(title: Text('Item not found.'));
-                    }
-                  },
-                );
               }
 
-              return const SizedBox.shrink();
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.titleLarge,
+                        children: [
+                          const TextSpan(text: 'No items found 🤷. \n'),
+                          const TextSpan(text: 'You can '),
+                          TextSpan(
+                            text: 'add here',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = () {
+                                    // Replace with your navigation logic
+                                    context.go('/');
+                                  },
+                          ),
+                          const TextSpan(text: '.'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Image.asset('assets/images/empty-basket.png', fit: BoxFit.cover, width: 322, height: 322),
+                  ],
+                ),
+              );
             },
           ),
           bottomNavigationBar: Padding(
