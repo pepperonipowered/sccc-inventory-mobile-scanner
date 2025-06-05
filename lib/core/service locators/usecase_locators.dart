@@ -2,6 +2,7 @@ import 'package:sccc_v3/feat/auth/domain/usecase/check_user_usecase.dart';
 import 'package:sccc_v3/feat/auth/domain/usecase/get_user_usecase.dart';
 import 'package:sccc_v3/feat/auth/domain/usecase/login_usecase.dart';
 import 'package:sccc_v3/feat/auth/domain/usecase/signout_usecase.dart';
+import 'package:sccc_v3/feat/borrow_list/domain/usecase/create_local_item_usecase.dart';
 import 'package:sccc_v3/feat/borrow_list/domain/usecase/delete_local_item_usecase.dart';
 import 'package:sccc_v3/feat/borrow_list/domain/usecase/equipment/create_local_equipment_usecase.dart';
 import 'package:sccc_v3/feat/borrow_list/domain/usecase/equipment/delte_local_equipment_usecase.dart';
@@ -31,6 +32,7 @@ void usecaseLocators() {
   // Borrow List Usecases
   getIt.registerSingleton<GetAllLocalItemsUsecase>(GetAllLocalItemsUsecase());
   getIt.registerSingleton<DeleteLocalItemUsecase>(DeleteLocalItemUsecase());
+  getIt.registerSingleton<CreateLocalItemUsecase>(CreateLocalItemUsecase());
 
   // Supply Usecases
   getIt.registerSingleton<GetAllSuppliesUsecase>(GetAllSuppliesUsecase());

@@ -25,4 +25,13 @@ class LocalItemRepoImpl implements LocalItemRepo {
       await getIt<LocalEquipmentCopyRepo>().deleteEquipmentCopy(localItem);
     }
   }
+
+  @override
+  Future<void> addItem(LocalItemEntity localItem) async {
+    if (localItem is LocalSupplyEntity) {
+      await getIt<LocalSupplyRepo>().addSupply(localItem);
+    } else if (localItem is LocalEquipmentCopyEntity) {
+      await getIt<LocalEquipmentCopyRepo>().addEquipmentCopy(localItem);
+    }
+  }
 }

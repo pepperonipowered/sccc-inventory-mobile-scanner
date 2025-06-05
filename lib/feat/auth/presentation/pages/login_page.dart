@@ -89,39 +89,46 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ],
         child: Scaffold(
-          body: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: Center(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AuthPageInfoText(
-                      pageTitle: 'Login',
-                      infoTextSub: 'Welcome back! Please enter your credentials to continue.',
+          body: BlocBuilder<AuthCubit, AuthStates>(
+            builder: (context, state) {
+              if (state is AuthLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: Center(
+                  child: SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        AuthPageInfoText(
+                          pageTitle: 'Login',
+                          infoTextSub: 'Welcome back! Please enter your credentials to continue.',
+                        ),
+                        SizedBox(height: 40),
+                        LoginForm(
+                          formKey: _formKey,
+                          emailController: _emailController,
+                          passwordVisible: _passwordVisible,
+                          passwordController: _passwordController,
+                        ),
+                        SizedBox(height: 24),
+                        AuthPromptText(
+                          promptText: 'Don\'t have an account?',
+                          actionText: 'Register here.',
+                          route: '/register',
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 40),
-                    LoginForm(
-                      formKey: _formKey,
-                      emailController: _emailController,
-                      passwordVisible: _passwordVisible,
-                      passwordController: _passwordController,
-                    ),
-                    SizedBox(height: 24),
-                    AuthPromptText(
-                      promptText: 'Don\'t have an account?',
-                      actionText: 'Register here.',
-                      route: '/register',
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),
